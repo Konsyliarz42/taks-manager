@@ -9,9 +9,79 @@ python = "^3.10"
 Flask = "^2.1.2"
 Flask-RESTful = "^0.3.9"
 peewee = "^3.14.10"
+peewee-migrate = "^1.4.8"
+python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
+taskipy = "^1.10.2"
+isort = "^5.10.1"
+black = "^22.3.0"
+pyproject-flake8 = "^0.0.1-alpha.4"
+bandit = "^1.7.4"
+mypy = "^0.960"
+pylint = "^2.13.9"
+coverage = "^6.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+# ----------------------------------------------------------------
+#   Taskipy
+# ----------------------------------------------------------------
+
+[tool.taskipy.settings]
+use_vars = true
+
+[tool.taskipy.variables]
+main_package = "task_manager"
+test_package = "tests"
+
+[tool.taskipy.tasks]
+bandit = "poetry run python -m bandit -r {main_package}"
+flake8 = "poetry run python -m pflake8 {main_package} {test_package} && echo All is ok"
+mypy = "poetry run python -m mypy {main_package} {test_package}"
+pylint = "poetry run python -m pylint {main_package} {test_package}"
+formatting = """
+    poetry run python -m isort --profile black {main_package} {test_package} \
+    && poetry run python -m black {main_package} {test_package} \
+    && git status -s\
+"""
+test = """
+    poetry run python -m coverage run --source={main_package} -m unittest {test_package} \
+    && poetry run python -m coverage report -m \
+"""
+
+# ----------------------------------------------------------------
+#   Pylint
+# ----------------------------------------------------------------
+
+[tool.pylint.master]
+fail-under = 9.0
+
+[tool.pylint.messages_control]
+disable = [
+  "missing-docstring",
+  "line-too-long",
+  "too-few-public-methods",
+]
+
+[tool.pylint.similarities]
+ignore-imports = "yes"
+
+# ----------------------------------------------------------------
+#   Flake8
+# ----------------------------------------------------------------
+
+[tool.flake8]
+# E501 - Line too long
+extend-ignore = "E501"
+extend-exclude = "build,dist"
+max-complexity = 10
+
+# ----------------------------------------------------------------
+#   Mypy
+# ----------------------------------------------------------------
+
+[tool.mypy]
+ignore_missing_imports = true

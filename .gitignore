@@ -1,1 +1,11 @@
+__pycache__
+
+.mypy_cache
+.coverage
 .venv
+.env
+
+*.db
+*.rest
+
+* copy*
