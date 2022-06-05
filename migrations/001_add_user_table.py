@@ -36,7 +36,7 @@ def migrate(migrator, database, fake=False, **kwargs):
         email = pw.CharField(max_length=255, unique=True)
         password = pw.CharField(max_length=512)
         is_admin = pw.BooleanField(constraints=[SQL("DEFAULT False")], default=False)
-        register_datetime = pw.DateTimeField(constraints=[SQL("DEFAULT (datetime('now','utc'))")], default=dt.datetime.utcnow())
+        register_at = pw.DateTimeField(constraints=[SQL("DEFAULT (datetime('now','utc'))")], default=dt.datetime.utcnow())
         first_name = pw.CharField(max_length=255)
         last_name = pw.CharField(max_length=255)
 
