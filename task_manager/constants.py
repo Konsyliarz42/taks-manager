@@ -16,3 +16,9 @@ class HttpCodes(Enum):
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
     NOT_FOUND = 404
+
+
+class TaskStatus(Enum):
+    TO_DO = "To Do"
+    IN_PROGRESS = "In Progress"
+    DONE = "Done"

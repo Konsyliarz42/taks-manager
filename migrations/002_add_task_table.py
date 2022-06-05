@@ -1,4 +1,4 @@
-"""Peewee migrations -- 002_add_user_table.py.
+"""Peewee migrations -- 002_add_task_table.py.
 
 Some examples (model - class or model name)::
 
@@ -24,6 +24,9 @@ Some examples (model - class or model name)::
 import datetime as dt
 import peewee as pw
 
+from task_manager.constants import TaskStatus
+
+
 SQL = pw.SQL
 
 
@@ -31,21 +34,29 @@ def migrate(migrator, database, fake=False, **kwargs):
     """Write your migrations here."""
 
     @migrator.create_model
-    class User(pw.Model):
+    class BaseModel(pw.Model):
         id = pw.AutoField()
-        email = pw.CharField(max_length=255, unique=True)
-        password = pw.CharField(max_length=512)
-        is_admin = pw.BooleanField(constraints=[SQL("DEFAULT False")], default=False)
-        registered_at = pw.DateTimeField(constraints=[SQL("DEFAULT (datetime('now','utc'))")], default=dt.datetime.utcnow())
-        first_name = pw.CharField(max_length=255)
-        last_name = pw.CharField(max_length=255)
 
         class Meta:
-            table_name = "user"
+            table_name = "basemodel"
+
+    @migrator.create_model
+    class Task(pw.Model):
+        id = pw.AutoField()
+        title = pw.CharField()
+        description = pw.TextField()
+        status = pw.CharField(constraints=[SQL("DEFAULT 'To Do'")], default=TaskStatus.TO_DO.value)
+        created_at = pw.DateTimeField(constraints=[SQL("DEFAULT (datetime('now','utc'))")], default=dt.datetime.utcnow())
+        owner = pw.ForeignKeyField(backref='tasks', column_name='owner', field='id', model=migrator.orm['user'])
+
+        class Meta:
+            table_name = "task"
 
 
 
 def rollback(migrator, database, fake=False, **kwargs):
     """Write your rollback migrations here."""
 
-    migrator.remove_model('user')
+    migrator.remove_model('task')
+
+    migrator.remove_model('basemodel')

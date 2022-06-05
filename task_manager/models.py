@@ -6,14 +6,21 @@ from typing import Optional
 from dotenv import load_dotenv
 from peewee import BooleanField
 from peewee import CharField as _CharField
-from peewee import DateTimeField, Model, SqliteDatabase, PostgresqlDatabase
+from peewee import (
+    DateTimeField,
+    ForeignKeyField,
+    Model,
+    PostgresqlDatabase,
+    SqliteDatabase,
+    TextField,
+)
 from playhouse.shortcuts import model_to_dict
 
-from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH
+from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH, TaskStatus
 
 load_dotenv()
 
-if os.environ["ENV"] == "production":  
+if os.environ["ENV"] == "production":
     db = PostgresqlDatabase(os.environ["DATABASE_URL"])
 else:
     db = SqliteDatabase(os.environ["DATABASE_URL"])
@@ -43,7 +50,17 @@ class CharField(_CharField):
 class User(BaseModel):
     email = CharField(unique=True)
     password = CharField(max_length=PASSWORD_FIELD_LENGTH["max"])
-    is_admin = BooleanField(default=False)
-    register_at = DateTimeField(default=datetime.utcnow())
     first_name = CharField()
     last_name = CharField()
+
+    is_admin = BooleanField(default=False)
+    registered_at = DateTimeField(default=datetime.utcnow())
+
+
+class Task(BaseModel):
+    title = CharField()
+    description = TextField(null=True)
+    status = CharField(default=TaskStatus.TO_DO.value)
+
+    created_at = DateTimeField(default=datetime.utcnow())
+    owner = ForeignKeyField(User, backref="tasks")

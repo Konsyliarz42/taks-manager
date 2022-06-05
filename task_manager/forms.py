@@ -1,6 +1,6 @@
 from wtforms import Form, ValidationError, fields, validators
 
-from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH
+from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH, TaskStatus
 from .models import User
 
 
@@ -45,4 +45,19 @@ class UserForm(Form):
             validators.Length(**STRING_FIELD_LENGTH),
             validators.DataRequired(),
         ],
+    )
+
+
+class TaskForm(Form):
+    title = fields.StringField(
+        label="Title",
+        validators=[
+            validators.Length(**STRING_FIELD_LENGTH),
+            validators.DataRequired(),
+        ],
+    )
+    description = fields.TextAreaField(label="Description")
+    status = fields.SelectField(
+        label="Status",
+        choices=[(status.value, status.name) for status in TaskStatus],
     )

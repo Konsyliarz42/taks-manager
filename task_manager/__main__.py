@@ -2,11 +2,13 @@ from argparse import ArgumentParser, MetavarTypeHelpFormatter
 from datetime import date
 
 from . import api, app, router
-from .resources import Users
+from .resources import TaskList, UserList
 
 
 def main(host: str, port: int, debug: bool) -> None:
-    api.add_resource(Users, "/users/")
+    api.add_resource(UserList, "/users/")
+    api.add_resource(TaskList, "/tasks/")
+
     app.run(host=host, port=port, debug=debug)
 
 
