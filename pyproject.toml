@@ -11,6 +11,8 @@ Flask-RESTful = "^0.3.9"
 peewee = "^3.14.10"
 peewee-migrate = "^1.4.8"
 python-dotenv = "^0.20.0"
+WTForms = "^3.0.1"
+email-validator = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 taskipy = "^1.10.2"
