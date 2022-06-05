@@ -17,5 +17,5 @@ app.config["ENV"] = os.environ["ENV"]
 db.connect()
 db.create_tables(BaseModel.__subclasses__())
 
-api = Api(app)
+api = Api(app, "/api")
 router = Router(db)

@@ -6,13 +6,17 @@ from typing import Optional
 from dotenv import load_dotenv
 from peewee import BooleanField
 from peewee import CharField as _CharField
-from peewee import DateTimeField, Model, SqliteDatabase
+from peewee import DateTimeField, Model, SqliteDatabase, PostgresqlDatabase
 from playhouse.shortcuts import model_to_dict
 
 from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH
 
 load_dotenv()
-db = SqliteDatabase(os.environ["DATABASE_URL"])
+
+if os.environ["ENV"] == "production":  
+    db = PostgresqlDatabase(os.environ["DATABASE_URL"])
+else:
+    db = SqliteDatabase(os.environ["DATABASE_URL"])
 
 # ================================================================
 
@@ -40,6 +44,6 @@ class User(BaseModel):
     email = CharField(unique=True)
     password = CharField(max_length=PASSWORD_FIELD_LENGTH["max"])
     is_admin = BooleanField(default=False)
-    register_datetime = DateTimeField(default=datetime.utcnow())
+    register_at = DateTimeField(default=datetime.utcnow())
     first_name = CharField()
     last_name = CharField()
