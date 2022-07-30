@@ -10,7 +10,7 @@ STRING_FIELD_LENGTH = {
 }
 
 
-class HttpCodes(Enum):
+class HttpCode(int, Enum):
     OK = 200
     CREATED = 201
     BAD_REQUEST = 400

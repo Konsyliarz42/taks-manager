@@ -1,8 +1,13 @@
 import re
 from unittest import TestCase
 
-from task_manager import api, app, db, views
+from peewee import SqliteDatabase
+
+from task_manager import api, app, views
 from task_manager.models import BaseModel
+
+MODELS = BaseModel.__subclasses__()
+test_db = SqliteDatabase(":memory:")
 
 
 def get_all_views():
@@ -20,7 +25,7 @@ def get_all_views():
 class BasicTestCase(TestCase):
     class Config:
         TESTING = True
-        DATABASE_URL = ":memory:"
+        DEBUG = True
         SECRET_KEY = "TestingSecretKey"
         ENV = "development"
 
@@ -30,11 +35,11 @@ class BasicTestCase(TestCase):
         self.api = api
         self.client = self.app.test_client()
         self.views = get_all_views()
+        test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
-        self.tearDown()
+        test_db.connect(True)
+        test_db.create_tables(MODELS)
 
     def tearDown(self) -> None:
-        db.close()
-        db.database = BasicTestCase.Config.DATABASE_URL
-        db.connect()
-        db.create_tables(BaseModel.__subclasses__())
+        test_db.drop_tables(MODELS)
+        test_db.close()

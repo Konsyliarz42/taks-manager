@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, MetavarTypeHelpFormatter
 
 from . import app
+from .models import BaseModel, db
 
 if __name__ == "__main__":
     parser = ArgumentParser(prog="task_manager")
@@ -40,4 +41,6 @@ if __name__ == "__main__":
     # --------------------------------
 
     args = parser.parse_args()
+    db.connect()
+    db.create_tables(BaseModel.__subclasses__())
     app.run(host=args.host, port=args.port, debug=args.debug)

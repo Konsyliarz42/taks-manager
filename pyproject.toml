@@ -51,7 +51,7 @@ formatting = """
     && git status -s\
 """
 test = """
-    poetry run python -m coverage run --source={main_package} -m unittest {test_package} \
+    poetry run python -m coverage run --source={main_package} -m unittest -v \
     && poetry run python -m coverage report -m \
 """
 
