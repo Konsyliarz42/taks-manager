@@ -1,3 +1,5 @@
+from werkzeug.test import TestResponse
+
 from task_manager import constants
 from task_manager.constants import HttpCode
 from tests import BasicTestCase
@@ -12,8 +14,11 @@ JSON_DATA = {
 
 
 class UserFormTestCase(BasicTestCase):
+    def post_response(self, data: dict) -> TestResponse:
+        return self.client.post(self.views["UserList"], json=data)
+
     def test_correct_form(self):
-        response = self.client.post(self.views["UserList"], json=JSON_DATA)
+        response = self.post_response(JSON_DATA)
 
         assert response.status_code == HttpCode.CREATED
         assert "password" not in response.json
@@ -22,98 +27,112 @@ class UserFormTestCase(BasicTestCase):
 
     def test_emails_are_unique(self):
         json_data = JSON_DATA.copy()
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
         assert response.status_code == HttpCode.CREATED
 
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_email_is_valid(self):
         json_data = JSON_DATA.copy()
         json_data["email"] = "xxxx@xxxx"
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_email_is_to_long(self):
         json_data = JSON_DATA.copy()
         json_data["email"] = "x" * constants.STRING_FIELD_LENGTH["max"] + "x@test.com"
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_email_is_required(self):
         json_data = JSON_DATA.copy()
         json_data.pop("email")
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     # --------------------------------
 
     def test_password_is_too_short(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["password"] = "x" * (constants.PASSWORD_FIELD_LENGTH["min"] - 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_password_is_too_long(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["password"] = "x" * (constants.PASSWORD_FIELD_LENGTH["max"] + 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
+
+        assert response.status_code == HttpCode.BAD_REQUEST
+
+    def test_confirm_password_is_the_same_like_password(self):
+        json_data = JSON_DATA.copy()
+        json_data["confirm_password"] = json_data["password"][::-1]
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_password_is_required(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data.pop("password")
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
+
+        assert response.status_code == HttpCode.BAD_REQUEST
+
+    def test_confirm_password_is_required(self):
+        json_data = JSON_DATA.copy()
+        json_data.pop("confirm_password")
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     # --------------------------------
 
     def test_first_name_is_too_short(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["first_name"] = "x" * (constants.STRING_FIELD_LENGTH["min"] - 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_first_name_is_too_long(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["first_name"] = "x" * (constants.STRING_FIELD_LENGTH["max"] + 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_first_name_is_required(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data.pop("first_name")
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     # --------------------------------
 
     def test_last_name_is_too_short(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["last_name"] = "x" * (constants.STRING_FIELD_LENGTH["min"] - 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_last_name_is_too_long(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data["last_name"] = "x" * (constants.STRING_FIELD_LENGTH["max"] + 1)
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST
 
     def test_last_name_is_required(self):
-        json_data = JSON_DATA
+        json_data = JSON_DATA.copy()
         json_data.pop("last_name")
-        response = self.client.post(self.views["UserList"], json=json_data)
+        response = self.post_response(json_data)
 
         assert response.status_code == HttpCode.BAD_REQUEST

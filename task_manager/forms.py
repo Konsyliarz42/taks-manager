@@ -32,6 +32,13 @@ class UserForm(Form):
             validators.DataRequired(),
         ],
     )
+    confirm_password = fields.PasswordField(
+        label="Confirm Password",
+        validators=[
+            validators.EqualTo("password"),
+            validators.DataRequired(),
+        ],
+    )
     first_name = fields.StringField(
         label="First Name",
         validators=[
