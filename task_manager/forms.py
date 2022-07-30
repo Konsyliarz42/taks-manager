@@ -59,5 +59,5 @@ class TaskForm(Form):
     description = fields.TextAreaField(label="Description")
     status = fields.SelectField(
         label="Status",
-        choices=[(status.value, status.name) for status in TaskStatus],
+        choices=[(status, status.name) for status in TaskStatus],
     )

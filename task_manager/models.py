@@ -52,7 +52,6 @@ class User(BaseModel):
     password = CharField(max_length=PASSWORD_FIELD_LENGTH["max"])
     first_name = CharField()
     last_name = CharField()
-
     is_admin = BooleanField(default=False)
     registered_at = DateTimeField(default=datetime.utcnow())
 
@@ -60,7 +59,6 @@ class User(BaseModel):
 class Task(BaseModel):
     title = CharField()
     description = TextField(null=True)
-    status = CharField(default=TaskStatus.TO_DO.value)
-
+    status = CharField(default=TaskStatus.DRAFT)
     created_at = DateTimeField(default=datetime.utcnow())
-    owner = ForeignKeyField(User, backref="tasks")
+    assigned = ForeignKeyField(User, backref="tasks", null=True)

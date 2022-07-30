@@ -1,12 +1,28 @@
-from flask_restful import Resource, request
+from typing import Type, Union
+
+from flask_restful import Resource
+from flask_restful import abort as restful_abort
+from flask_restful import request
 
 from .constants import HttpCodes
 from .forms import TaskForm, UserForm
 from .models import Task, User, model_to_json
 
 
+def abort(code: HttpCodes):
+    restful_abort(code.value)
+
+
 def make_response(data: dict, code: HttpCodes = HttpCodes.OK):
     return (data, code.value)
+
+
+def get_or_404(model: Union[Type["User"], Type["Task"]], model_id: int) -> Union[User, Task]:
+    records = model.select().where(model.id == model_id)
+    return records[0] if records else abort(HttpCodes.NOT_FOUND)
+
+
+# ================================================================
 
 
 class UserList(Resource):
@@ -27,6 +43,18 @@ class UserList(Resource):
         return make_response(form.errors, HttpCodes.BAD_REQUEST)
 
 
+class UserView(Resource):
+    @staticmethod
+    def get(user_id: int):
+        user: User = get_or_404(User, user_id)
+        user_json = model_to_json(user)
+
+        return make_response(user_json, HttpCodes.OK)
+
+
+# ================================================================
+
+
 class TaskList(Resource):
     @staticmethod
     def get():
@@ -36,7 +64,7 @@ class TaskList(Resource):
     @staticmethod
     def post():
         data = request.get_json(True)
-        data["status"] = Task().status  # When create status must be default
+        data["status"] = Task().status  # When create it must be default
         form = TaskForm(data=data)
 
         if form.validate():
@@ -44,3 +72,12 @@ class TaskList(Resource):
             return make_response(task, HttpCodes.CREATED)
 
         return make_response(form.errors, HttpCodes.BAD_REQUEST)
+
+
+class TaskView(Resource):
+    @staticmethod
+    def get(task_id: int):
+        task: Task = get_or_404(Task, task_id)
+        task_json = model_to_json(task)
+
+        return make_response(task_json, HttpCodes.OK)

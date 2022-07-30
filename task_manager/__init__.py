@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_restful import Api
-from peewee_migrate import Router
 
 from .models import BaseModel, db
 
@@ -18,4 +17,3 @@ db.connect()
 db.create_tables(BaseModel.__subclasses__())
 
 api = Api(app, "/api")
-router = Router(db)

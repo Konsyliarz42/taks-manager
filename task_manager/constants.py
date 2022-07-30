@@ -18,7 +18,9 @@ class HttpCodes(Enum):
     NOT_FOUND = 404
 
 
-class TaskStatus(Enum):
+class TaskStatus(str, Enum):
+    DRAFT = "Draft"
     TO_DO = "To Do"
     IN_PROGRESS = "In Progress"
     DONE = "Done"
+    CANCELLED = "Cancelled"

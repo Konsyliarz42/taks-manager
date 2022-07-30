@@ -1,12 +1,15 @@
 from argparse import ArgumentParser, MetavarTypeHelpFormatter
 
 from . import api, app
-from .resources import TaskList, UserList
+from .resources import TaskList, TaskView, UserList, UserView
 
 
 def main(host: str, port: int, debug: bool) -> None:
     api.add_resource(UserList, "/users/")
+    api.add_resource(UserView, "/user/<int:user_id>/")
+
     api.add_resource(TaskList, "/tasks/")
+    api.add_resource(TaskView, "/task/<int:task_id>/")
 
     app.run(host=host, port=port, debug=debug)
 
@@ -50,4 +53,3 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(host=args.host, port=args.port, debug=args.debug)
-
