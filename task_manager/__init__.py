@@ -13,7 +13,6 @@ app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 app.config["DATABASE_URL"] = os.environ["DATABASE_URL"]
 app.config["ENV"] = os.environ["ENV"]
 
-
 api = Api(app, "/api")
 
 for endpoint, resource in API_VIEWS.items():

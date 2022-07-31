@@ -1,25 +1,14 @@
-from wtforms import Form, ValidationError, fields, validators
+from wtforms import Form, fields
 
+from . import form_validators as validators
 from .constants import PASSWORD_FIELD_LENGTH, STRING_FIELD_LENGTH, TaskStatus
-from .models import User
 
 
-class UniqueEmailValidator:
-    def __init__(self, message=None) -> None:
-        self.message = message or "Field must be unique."
-
-    def __call__(self, _form, field) -> None:
-        data = User.select(User.email).where(User.email == field.data).limit(1)
-
-        if data:
-            raise ValidationError(self.message)
-
-
-class UserForm(Form):
+class AddUserForm(Form):
     email = fields.EmailField(
         label="E-mail",
         validators=[
-            UniqueEmailValidator(),
+            validators.UniqueEmail(),
             validators.Email(),
             validators.Length(**STRING_FIELD_LENGTH),
             validators.DataRequired(),
@@ -55,7 +44,52 @@ class UserForm(Form):
     )
 
 
-class TaskForm(Form):
+class UpdateUserForm(Form):
+    email = fields.EmailField(
+        label="E-mail",
+        validators=[
+            validators.UniqueEmail(),
+            validators.Email(),
+            validators.Length(**STRING_FIELD_LENGTH),
+        ],
+    )
+    old_password = fields.PasswordField(
+        label="Old Password",
+        validators=[
+            validators.OldPasswordIsCorrect(),
+            validators.Length(**PASSWORD_FIELD_LENGTH),
+        ],
+    )
+    password = fields.PasswordField(
+        label="Password",
+        validators=[
+            validators.Length(**PASSWORD_FIELD_LENGTH),
+        ],
+    )
+    confirm_password = fields.PasswordField(
+        label="Confirm Password",
+        validators=[
+            validators.EqualTo("password"),
+        ],
+    )
+    first_name = fields.StringField(
+        label="First Name",
+        validators=[
+            validators.Length(**STRING_FIELD_LENGTH),
+        ],
+    )
+    last_name = fields.StringField(
+        label="Last Name",
+        validators=[
+            validators.Length(**STRING_FIELD_LENGTH),
+        ],
+    )
+
+
+# ================================================================
+
+
+class AddTaskForm(Form):
     title = fields.StringField(
         label="Title",
         validators=[
@@ -64,7 +98,23 @@ class TaskForm(Form):
         ],
     )
     description = fields.TextAreaField(label="Description")
+    assigned = fields.IntegerField(
+        label="Assigned", validators=[validators.UserIsActive()]
+    )
+
+
+class UpdateTaskForm(Form):
+    title = fields.StringField(
+        label="Title",
+        validators=[
+            validators.Length(**STRING_FIELD_LENGTH),
+        ],
+    )
+    description = fields.TextAreaField(label="Description")
     status = fields.SelectField(
         label="Status",
         choices=[(status, status.name) for status in TaskStatus],
+    )
+    assigned = fields.IntegerField(
+        label="Assigned", validators=[validators.UserIsActive()]
     )

@@ -10,16 +10,16 @@ MODELS = BaseModel.__subclasses__()
 test_db = SqliteDatabase(":memory:")
 
 
-def get_all_views():
-    all_views = {}
+def get_api_views():
+    api_views = {}
     variable_pattern = re.compile(r"/<(.*)>/")
 
     for endpoint, resource in views.API_VIEWS.items():
-        all_views[resource.whoami(resource())] = "/api" + re.sub(
+        api_views[resource.whoami(resource())] = "/api" + re.sub(
             variable_pattern, "/{}/", endpoint
         )
 
-    return all_views
+    return api_views
 
 
 class BasicTestCase(TestCase):
@@ -34,7 +34,7 @@ class BasicTestCase(TestCase):
         self.app = app
         self.api = api
         self.client = self.app.test_client()
-        self.views = get_all_views()
+        self.views = get_api_views()
         test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
 
         test_db.connect(True)

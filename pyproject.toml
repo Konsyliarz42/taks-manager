@@ -67,6 +67,7 @@ disable = [
   "missing-docstring",
   "line-too-long",
   "too-few-public-methods",
+  "unused-import"
 ]
 
 [tool.pylint.similarities]

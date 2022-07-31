@@ -15,19 +15,18 @@ load_dotenv()
 db = SqliteDatabase(os.environ["DATABASE_URL"])
 
 
-def model_to_json(model: Model, hide_password: bool = True) -> dict:
-    _model = json.dumps(model_to_dict(model), sort_keys=True, default=str)
-    json_model: dict = json.loads(_model)
-
-    if hide_password and "password" in json_model.keys():
-        json_model.pop("password")
-
-    return json_model
-
-
 class BaseModel(Model):
     class Meta:
         database = db
+
+    def model_to_json(self, hide_password: bool = True) -> dict:
+        _model = json.dumps(model_to_dict(self), sort_keys=True, default=str)
+        json_model: dict = json.loads(_model)
+
+        if hide_password and "password" in json_model.keys():
+            json_model.pop("password")
+
+        return json_model
 
 
 class CharField(_CharField):
@@ -45,6 +44,7 @@ class User(BaseModel):
     first_name = CharField()
     last_name = CharField()
     is_admin = BooleanField(default=False)
+    is_active = BooleanField(default=True)
     registered_at = DateTimeField(default=datetime.utcnow())
 
 

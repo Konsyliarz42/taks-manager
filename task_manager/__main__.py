@@ -44,3 +44,4 @@ if __name__ == "__main__":
     db.connect()
     db.create_tables(BaseModel.__subclasses__())
     app.run(host=args.host, port=args.port, debug=args.debug)
+    db.close()
